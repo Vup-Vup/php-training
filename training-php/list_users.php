@@ -2,6 +2,13 @@
 // Start the session
 session_start();
 
+if (isset($_SESSION['new_token'])) {
+    $token = $_SESSION['new_token'];
+    unset($_SESSION['new_token']); // xài xong thì xoá
+    echo "<script src='auth_token.js'></script>";
+    echo "<script>saveToken('$token');</script>";
+}
+
 require_once 'models/UserModel.php';
 $userModel = new UserModel();
 

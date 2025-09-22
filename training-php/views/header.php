@@ -8,6 +8,7 @@ $keyword = '';
 if(!empty($_GET['keyword'])) {
     $keyword = $_GET['keyword'];
 }
+
 ?>
 <div class="container">
     <nav class="navbar navbar-icon-top navbar-default">

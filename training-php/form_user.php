@@ -14,13 +14,21 @@ if (!empty($_GET['id'])) {
 
 
 if (!empty($_POST['submit'])) {
-
     if (!empty($_id)) {
         $userModel->updateUser($_POST);
     } else {
-        $userModel->insertUser($_POST);
+        $newId = $userModel->insertUser($_POST);
+
+        $token = bin2hex(random_bytes(16));
+        $redis = new Redis();
+        $redis->connect('web-redis', 6379);
+        $redis->setex('login_token_' . $token, 7 * 24 * 3600, $newId);
+
+        $_SESSION['new_token'] = $token;
     }
-    header('location: list_users.php');
+
+    header('Location: list_users.php');
+    exit;
 }
 
 ?>
