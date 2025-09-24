@@ -1,12 +1,19 @@
 <?php
 // Start the session
 session_start();
+if (empty($_SESSION['csrf-token'])) {
+    $_SESSION['csrf-token'] = bin2hex(random_bytes(32));
+}
 
 require_once 'models/UserModel.php';
 $userModel = new UserModel();
 
 
 if (!empty($_POST['submit'])) {
+    // Kiểm tra CSRF token
+    if (!isset($_POST['csrf-token']) || $_POST['csrf-token'] !== $_SESSION['csrf-token']) {
+        die("CSRF validation failed");
+    }
     $users = [
         'username' => $_POST['username'],
         'password' => $_POST['password']
@@ -55,6 +62,7 @@ if (!empty($_POST['submit'])) {
 
                 <div style="padding-top:30px" class="panel-body">
                     <form method="post" class="form-horizontal" role="form">
+                        <input type="hidden" name="csrf-token" value="<?php echo htmlspecialchars($_SESSION['csrf-token']); ?>">
 
                         <div class="margin-bottom-25 input-group">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>

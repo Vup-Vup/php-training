@@ -4,6 +4,16 @@ session_start();
 require_once 'models/UserModel.php';
 $userModel = new UserModel();
 
+// CSRF check for POST
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (
+        !isset($_POST['csrf-token']) ||
+        $_POST['csrf-token'] !== $_SESSION['csrf-token']
+    ) {
+        die('Invalid CSRF token');
+    }
+}
+
 $user = NULL; //Add new user
 $_id = NULL;
 
@@ -30,7 +40,6 @@ if (!empty($_POST['submit'])) {
     header('Location: list_users.php');
     exit;
 }
-
 ?>
 <!DOCTYPE html>
 <html>
@@ -48,6 +57,7 @@ if (!empty($_POST['submit'])) {
                 </div>
                 <form method="POST">
                     <input type="hidden" name="id" value="<?php echo $_id ?>">
+                    <input type="hidden" name="csrf-token" value="<?php echo $_SESSION['csrf-token'] ?>">
                     <div class="form-group">
                         <label for="name">Name</label>
                         <input class="form-control" name="name" placeholder="Name" value='<?php if (!empty($user[0]['name'])) echo $user[0]['name'] ?>'>
