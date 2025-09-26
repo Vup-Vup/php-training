@@ -17,8 +17,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $user = NULL; //Add new user
 $_id = NULL;
 
-if (!empty($_GET['id'])) {
-    $_id = $_GET['id'];
+if (!empty($_POST['id'])) {
+    $_id = $_POST['id'];
     $user = $userModel->findUserById($_id);//Update existing user
 }
 
@@ -56,11 +56,11 @@ if (!empty($_POST['submit'])) {
                     User form
                 </div>
                 <form method="POST">
-                    <input type="hidden" name="id" value="<?php echo $_id ?>">
-                    <input type="hidden" name="csrf-token" value="<?php echo $_SESSION['csrf-token'] ?>">
+                    <input type="hidden" name="id" value="<?php echo htmlspecialchars($_id, ENT_QUOTES, 'UTF-8'); ?>">
+                    <input type="hidden" name="csrf-token" value="<?php echo htmlspecialchars($_SESSION['csrf-token'], ENT_QUOTES, 'UTF-8'); ?>">
                     <div class="form-group">
                         <label for="name">Name</label>
-                        <input class="form-control" name="name" placeholder="Name" value='<?php if (!empty($user[0]['name'])) echo $user[0]['name'] ?>'>
+                        <input class="form-control" name="name" placeholder="Name" value="<?php if (!empty($user[0]['name'])) echo htmlspecialchars($user[0]['name'], ENT_QUOTES, 'UTF-8'); ?>">
                     </div>
                     <div class="form-group">
                         <label for="password">Password</label>

@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (
-    !isset($_GET['csrf-token']) || $_GET['csrf-token'] !== $_SESSION['csrf-token']
+    !isset($_POST['csrf-token']) || $_POST['csrf-token'] !== $_SESSION['csrf-token']
 ) {
     die('Invalid CSRF token');
 }
@@ -11,8 +11,8 @@ $userModel = new UserModel();
 $user = NULL; //Add new user
 $id = NULL;
 
-if (!empty($_GET['id'])) {
-    $id = $_GET['id'];
+if (!empty($_POST['id'])) {
+    $id = $_POST['id'];
     $user = $userModel->findUserById($id); //Update existing user
 }
 

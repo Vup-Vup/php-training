@@ -22,7 +22,6 @@ if (!empty($_POST['submit'])) {
     if ($user = $userModel->auth($users['username'], $users['password'])) {
         //Login successful
         $_SESSION['id'] = $user[0]['id'];
-        $_SESSION['name'] = $user[0]['name'];
         $_SESSION['message'] = 'Login successful';
 
         if (!empty($_POST['remember'])) {
@@ -61,12 +60,22 @@ if (!empty($_POST['submit'])) {
                 </div>
 
                 <div style="padding-top:30px" class="panel-body">
+                    <?php if (!empty($_SESSION['message'])): ?>
+                        <div class="alert alert-info">
+                            <?php 
+                                echo htmlspecialchars($_SESSION['message'], ENT_QUOTES, 'UTF-8'); 
+                                unset($_SESSION['message']);
+                            ?>
+                        </div>
+                    <?php endif; ?>
                     <form method="post" class="form-horizontal" role="form">
                         <input type="hidden" name="csrf-token" value="<?php echo htmlspecialchars($_SESSION['csrf-token']); ?>">
 
                         <div class="margin-bottom-25 input-group">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-                            <input id="login-username" type="text" class="form-control" name="username" value="" placeholder="username or email">
+                            <input id="login-username" type="text" class="form-control" name="username" 
+                                value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username'], ENT_QUOTES, 'UTF-8') : ''; ?>" 
+                                placeholder="username or email">
                         </div>
 
                         <div class="margin-bottom-25 input-group">

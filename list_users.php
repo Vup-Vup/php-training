@@ -63,17 +63,17 @@ $users = $userModel->getUsers($params);
                             </td>
                             <td>
                                 <!-- Update Form -->
-                                <form action="form_user.php" method="get" style="display:inline;">
-                                    <input type="hidden" name="id" value="<?php echo $user['id'] ?>">
-                                    <input type="hidden" name="csrf-token" value="<?php echo $_SESSION['csrf-token'] ?>">
+                                <form action="form_user.php" method="post" style="display:inline;">
+                                    <input type="hidden" name="id" value="<?php echo htmlspecialchars($user['id'], ENT_QUOTES, 'UTF-8'); ?>">
+                                    <input type="hidden" name="csrf-token" value="<?php echo htmlspecialchars($_SESSION['csrf-token'], ENT_QUOTES, 'UTF-8'); ?>">
                                     <button type="submit" style="background:none;border:none;padding:0;">
                                         <i class="fa fa-pencil-square-o" aria-hidden="true" title="Update"></i>
                                     </button>
                                 </form>
                                 <!-- View Form -->
-                                <form action="view_user.php" method="get" style="display:inline;">
-                                    <input type="hidden" name="id" value="<?php echo $user['id'] ?>">
-                                    <input type="hidden" name="csrf-token" value="<?php echo $_SESSION['csrf-token'] ?>">
+                                <form action="view_user.php" method="post" style="display:inline;">
+                                    <input type="hidden" name="id" value="<?php echo htmlspecialchars($user['id'], ENT_QUOTES, 'UTF-8'); ?>">
+                                    <input type="hidden" name="csrf-token" value="<?php echo htmlspecialchars($_SESSION['csrf-token'], ENT_QUOTES, 'UTF-8'); ?>">
                                     <button type="submit" style="background:none;border:none;padding:0;">
                                         <i class="fa fa-eye" aria-hidden="true" title="View"></i>
                                     </button>
