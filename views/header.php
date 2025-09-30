@@ -6,7 +6,7 @@ if(!empty($_SESSION['id'])) {
 
 $keyword = '';
 if(!empty($_GET['keyword'])) {
-    $keyword = $_GET['keyword'];
+    $keyword = htmlspecialchars($_GET['keyword']);
 }
 
 ?>

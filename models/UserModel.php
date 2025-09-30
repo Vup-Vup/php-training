@@ -1,100 +1,81 @@
 <?php
-
 require_once 'BaseModel.php';
 
-class UserModel extends BaseModel {
+class UserModel extends BaseModel
+{
 
-    public function findUserById($id) {
-        $sql = 'SELECT * FROM users WHERE id = '.$id;
-        $user = $this->select($sql);
-
-        return $user;
+    public function findUserById($id)
+    {
+        $sql = 'SELECT * FROM users WHERE id = ?';
+        $rows = $this->selectPrepared($sql, 'i', [$id]);
+        return !empty($rows) ? $rows[0] : null;
     }
 
-    public function findUser($keyword) {
-        $sql = 'SELECT * FROM users WHERE user_name LIKE %'.$keyword.'%'. ' OR user_email LIKE %'.$keyword.'%';
-        $user = $this->select($sql);
-
-        return $user;
+    public function findUser($keyword)
+    {
+        // search in name or email (adjust column names to your schema)
+        $sql = 'SELECT * FROM users WHERE name LIKE ? OR email LIKE ?';
+        $like = '%' . $keyword . '%';
+        return $this->selectPrepared($sql, 'ss', [$like, $like]);
     }
 
-    /**
-     * Authentication user
-     * @param $userName
-     * @param $password
-     * @return array
-     */
-    public function auth($userName, $password) {
-        $md5Password = md5($password);
-        $sql = 'SELECT * FROM users WHERE name = "' . $userName . '" AND password = "'.$md5Password.'"';
+    public function auth($userName, $password)
+    {
+        $sql = 'SELECT * FROM users WHERE name = ? LIMIT 1';
+        $rows = $this->selectPrepared($sql, 's', [$userName]);
 
-        $user = $this->select($sql);
-        return $user;
+        if (empty($rows)) {
+            error_log("User not found: " . $userName);
+            return null;
+        }
+
+        $user = $rows[0];
+        error_log("Found user: " . print_r($user, true));
+
+        // Kiểm tra mật khẩu bằng md5
+        if (isset($user['password']) && md5($password) === $user['password']) {
+            error_log("Password matched (md5)");
+            return $user; // Mật khẩu đúng
+        } else {
+            error_log("Password does not match (md5)");
+        }
+        return null; // Nếu không khớp mật khẩu
     }
 
-    /**
-     * Delete user by id
-     * @param $id
-     * @return mixed
-     */
-    public function deleteUserById($id) {
-        $sql = 'DELETE FROM users WHERE id = '.$id;
-        return $this->delete($sql);
 
+    public function deleteUserById($id)
+    {
+        $sql = 'DELETE FROM users WHERE id = ?';
+        return $this->executePrepared($sql, 'i', [$id]);
     }
 
-    /**
-     * Update user
-     * @param $input
-     * @return mixed
-     */
-    public function updateUser($input) {
-        $sql = 'UPDATE users SET 
-                 name = "' . mysqli_real_escape_string(self::$_connection, $input['name']) .'", 
-                 password="'. md5($input['password']) .'"
-                WHERE id = ' . $input['id'];
-
-        $user = $this->update($sql);
-
-        return $user;
+    public function updateUser($input)
+    {
+        // ensure id exists
+        $sql = 'UPDATE users SET name = ?, password = ? WHERE id = ?';
+        // Hash password bằng md5
+        $hashed = md5($input['password']);
+        return $this->executePrepared($sql, 'ssi', [$input['name'], $hashed, $input['id']]);
     }
 
-    /**
-     * Insert user
-     * @param $input
-     * @return mixed
-     */
-    public function insertUser($input) {
-        $sql = "INSERT INTO `app_web1`.`users` (`name`, `password`) VALUES (" .
-                "'" . $input['name'] . "', '".md5($input['password'])."')";
-
-        $user = $this->insert($sql);
-
-        return $user;
+    public function insertUser($input)
+    {
+        $sql = 'INSERT INTO users (`name`, `password`) VALUES (?, ?)';
+        $hashed = md5($input['password']);
+        return $this->executePrepared($sql, 'ss', [$input['name'], $hashed]);
     }
 
-    /**
-     * Search users
-     * @param array $params
-     * @return array
-     */
-    public function getUsers($params = []) {
-        //Keyword
+    public function getUsers($params = [])
+    {
         if (!empty($params['keyword'])) {
-            $sql = 'SELECT * FROM users WHERE name LIKE "%' . $params['keyword'] .'%"';
-
-            //Keep this line to use Sql Injection
-            //Don't change
-            //Example keyword: abcef%";TRUNCATE banks;##
-            $users = self::$_connection->multi_query($sql);
-
-            //Get data
-            $users = $this->query($sql);
+            // Use prepared statement to avoid injection and avoid multi_query
+            $sql = 'SELECT * FROM users WHERE name LIKE ?';
+            $like = '%' . $params['keyword'] . '%';
+            $users = $this->selectPrepared($sql, 's', [$like]);
         } else {
             $sql = 'SELECT * FROM users';
             $users = $this->select($sql);
         }
-
         return $users;
     }
 }

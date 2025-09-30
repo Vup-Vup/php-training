@@ -56,11 +56,11 @@ if (!empty($_POST['submit'])) {
                     User form
                 </div>
                 <form method="POST">
-                    <input type="hidden" name="id" value="<?php echo htmlspecialchars($_id, ENT_QUOTES, 'UTF-8'); ?>">
+                    <input type="hidden" name="id" value="<?php if(isset($_id)) echo htmlspecialchars($_id, ENT_QUOTES, 'UTF-8'); ?>">
                     <input type="hidden" name="csrf-token" value="<?php echo htmlspecialchars($_SESSION['csrf-token'], ENT_QUOTES, 'UTF-8'); ?>">
                     <div class="form-group">
                         <label for="name">Name</label>
-                        <input class="form-control" name="name" placeholder="Name" value="<?php if (!empty($user[0]['name'])) echo htmlspecialchars($user[0]['name'], ENT_QUOTES, 'UTF-8'); ?>">
+                        <input class="form-control" name="name" placeholder="Name" value="<?php if (!empty($user['name'])) echo htmlspecialchars($user['name'], ENT_QUOTES, 'UTF-8'); ?>">
                     </div>
                     <div class="form-group">
                         <label for="password">Password</label>

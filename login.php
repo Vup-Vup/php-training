@@ -21,14 +21,14 @@ if (!empty($_POST['submit'])) {
     $user = NULL;
     if ($user = $userModel->auth($users['username'], $users['password'])) {
         //Login successful
-        $_SESSION['id'] = $user[0]['id'];
+        $_SESSION['id'] = $user['id'];
         $_SESSION['message'] = 'Login successful';
 
         if (!empty($_POST['remember'])) {
             $token = bin2hex(random_bytes(16));
             $redis = new Redis();
             $redis->connect('web-redis', 6379);
-            $redis->setex('login_token_' . $token, 7 * 24 * 3600, $user[0]['id']);
+            $redis->setex('login_token_' . $token, 7 * 24 * 3600, $user['id']);
 
             $_SESSION['new_token'] = $token;
         }
